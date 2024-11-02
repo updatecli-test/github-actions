@@ -1,0 +1,55 @@
+name: Updatecli Compose
+
+on:
+#  push:
+#    branches:
+#      - main
+#  schedule:
+#    - cron: "*/15 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: "write"
+  pull-requests: "write"
+
+env:
+  UPDATECLI_ORG: updatecli-test
+  OTHER_ORG: updatecli
+  UPDATECLI_REPO: github-actions
+  UPDATECLI_BRANCH: main
+
+jobs:
+  updatecli:
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - uses: tibdex/github-app-token@v2.1
+        id: own_token
+        with:
+          app_id: ${{ secrets.GITHUB_APP_ID }}
+          private_key: ${{ secrets.GITHUB_APP_PRIVATE_KEY }}
+          installation_retrieval_mode: organization
+          installation_retrieval_payload: ${{ env.UPDATECLI_ORG }}
+      - uses: tibdex/github-app-token@v2.1
+        id: source_token
+        with:
+          app_id: ${{ secrets.GITHUB_APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          installation_retrieval_mode: organization
+          installation_retrieval_payload: ${{ env.OTHER_GITHUB_ORG }}
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Install Updatecli in the runner
+        uses: updatecli/updatecli-action@v2
+      - name: Run Updatecli in Dry Run mode
+        run: "updatecli compose diff"
+        env:
+          GITHUB_TOKEN: ${{ steps.own_token.outputs.token }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          UPDATE_GITHUB_TOKEN: ${{ steps.source_token.outputs.token }}
+      - name: Run Updatecli in apply mode
+        if: github.ref == 'refs/heads/main'
+        run: "updatecli compose apply"
+        env:
+          GITHUB_TOKEN: ${{ steps.own_token.outputs.token }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          UPDATE_GITHUB_TOKEN: ${{ steps.source_token.outputs.token }}
