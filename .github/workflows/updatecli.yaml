@@ -39,7 +39,7 @@ jobs:
       - name: Checkout the repository
         uses: "actions/checkout@v4.2.2"
       - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@v2
+        uses: "updatecli/updatecli-action@v2"
       - name: Run Updatecli in Dry Run mode
         run: "updatecli compose diff"
         env:
