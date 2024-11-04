@@ -37,7 +37,7 @@ jobs:
           installation_retrieval_mode: organization
           installation_retrieval_payload: ${{ env.OTHER_GITHUB_ORG }}
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: "actions/checkout@v4.2.2"
       - name: Install Updatecli in the runner
         uses: updatecli/updatecli-action@v2
       - name: Run Updatecli in Dry Run mode
