@@ -1,0 +1,20 @@
+name: Checkout
+description: Checkout code
+runs:
+  using: composite
+  steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: vars
+      id: vars
+      shell: bash
+      run: |
+        echo "git_commit=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        echo "git_branch=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
+outputs:
+  git_commit:
+    description: "git hash (short)"
+    value: ${{ steps.vars.outputs.git_commit }}
+  git_branch:
+    description: "current git branch"
+    value: ${{ steps.vars.outputs.git_branch }}
